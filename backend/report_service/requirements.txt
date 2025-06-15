@@ -1,0 +1,8 @@
+# report_service/requirements.txt
+
+fastapi
+uvicorn[standard]
+pandas
+openpyxl # Untuk mendukung export ke file .xlsx
+sqlalchemy
+psycopg2-binary

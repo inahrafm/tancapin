@@ -1,0 +1,6 @@
+# prediction_service/requirements.txt
+
+fastapi
+uvicorn[standard]
+pandas
+scikit-learn

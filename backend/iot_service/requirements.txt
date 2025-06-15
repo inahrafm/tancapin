@@ -1,0 +1,6 @@
+# iot_service/requirements.txt
+
+fastapi
+uvicorn[standard]
+psycopg2-binary
+sqlalchemy

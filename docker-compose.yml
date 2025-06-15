@@ -1,0 +1,102 @@
+# docker-compose.yml
+# Atribut 'version' sudah usang dan dihapus. Docker Compose akan otomatis menggunakan versi terbaru.
+
+services:
+  # Layanan untuk IoT Service kita
+  iot-service:
+    build: ./backend/iot_service  # Arahkan ke folder yang ada Dockerfile-nya
+    container_name: tancap_iot_service
+    ports:
+      - "8001:8000"  # Map port 8001 di komputermu ke port 8000 di dalam container
+    volumes:
+      - ./backend/iot_service/app:/code/app # <-- PATH VOLUMES DIPERBARUI
+    env_file:
+      - ./.env # Muat file environment
+    depends_on:
+      - db
+      - mqtt-broker
+
+  user-service:
+    build: ./backend/user_service
+    container_name: tancap_user_service
+    ports:
+      - "8002:8000" # Kita gunakan port 8002 untuk layanan ini
+    volumes:
+      - ./backend/user_service/app:/code/app # <-- PATH VOLUMES DIPERBARUI
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+
+  prediction-service:
+    build: ./backend/prediction_service
+    container_name: tancap_prediction_service
+    ports:
+      - "8003:8000" # Kita gunakan port 8003 untuk layanan ini
+    volumes:
+      - ./backend/prediction_service/app:/code/app # <-- PATH VOLUMES DIPERBARUI
+    env_file:
+      - ./.env # Jika nanti butuh env variables, kita sudah sediakan
+    # prediction-service tidak tergantung langsung pada database di startup,
+    # tetapi nantinya akan mengambil data dari iot-service atau db secara tidak langsung.
+    # Namun untuk saat ini kita tidak menambahkan depends_on ke db
+
+  recommendation-service:
+    build: ./backend/recommendation_service
+    container_name: tancap_recommendation_service
+    ports:
+      - "8004:8000" # Kita gunakan port 8004 untuk layanan ini
+    volumes:
+      - ./backend/recommendation_service/app:/code/app # <-- PATH VOLUMES DIPERBARUI
+    env_file:
+      - ./.env
+    # Layanan ini tidak tergantung langsung pada DB atau layanan lain di startup,
+    # tapi secara fungsional akan menggunakan data dari IoT dan Prediksi
+
+  report-service:
+    build: ./backend/report_service
+    container_name: tancap_report_service
+    ports:
+      - "8005:8000" # Kita gunakan port 8005 untuk layanan ini
+    volumes:
+      - ./backend/report_service/app:/code/app # <-- PATH VOLUMES DIPERBARUI
+    env_file:
+      - ./.env
+    depends_on: # Layanan ini membutuhkan database untuk mengambil data
+      - db
+
+  # LAYANAN FRONTEND ANDA
+  frontend-service:
+    build: ./frontend/tancap-frontend # Menunjuk ke folder frontend Anda
+    container_name: tancap_frontend_service
+    ports:
+      - "8080:80" # Map port 80 kontainer (Nginx) ke port 8080 di host Anda
+    # Tidak perlu volume untuk development jika sudah pakai multi-stage build dan file sudah di-copy saat build.
+    # Namun, jika ingin live-reload di development, Anda bisa mengaktifkan baris berikut (dengan resiko performa build):
+    # volumes:
+    #   - ./frontend/tancap-frontend:/app
+
+
+  # Layanan untuk Database (kita pakai TimescaleDB)
+  db:
+    image: timescale/timescaledb:latest-pg14
+    container_name: tancap_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - tancap_db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+
+  # Layanan untuk MQTT Broker (kita pakai Mosquitto)
+  mqtt-broker:
+    image: eclipse-mosquitto:2
+    container_name: tancap_mqtt
+    ports:
+      - "1883:1883"  # Port standar MQTT
+      - "9001:9001"  # Port untuk WebSocket (jika butuh)
+
+volumes:
+  tancap_db_data: # Deklarasi volume untuk database

@@ -1,0 +1,14 @@
+# user_service/requirements.txt
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+
+# Untuk hashing password
+passlib[bcrypt]
+
+# Untuk membuat dan verifikasi token JWT
+python-jose[cryptography]
+
+# --- TAMBAHKAN BARIS INI ---
+python-multipart
