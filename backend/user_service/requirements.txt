@@ -1,14 +1,11 @@
-# user_service/requirements.txt
+# backend/user_service/requirements.txt
 fastapi
 uvicorn[standard]
 sqlalchemy
 psycopg2-binary
-
-# Untuk hashing password
 passlib[bcrypt]
-
-# Untuk membuat dan verifikasi token JWT
+bcrypt
 python-jose[cryptography]
+email-validator
 
-# --- TAMBAHKAN BARIS INI ---
-python-multipart
+python-multipart # <--- TAMBAHKAN BARIS INI

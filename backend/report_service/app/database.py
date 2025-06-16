@@ -1,9 +1,9 @@
-# iot_service/app/database.py
+# backend/report_service/app/database.py
 
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session # <--- Pastikan Session diimport
 
 # Mengambil URL database dari environment variables yang kita set di docker-compose
 # Format: postgresql://user:password@host/database
@@ -21,3 +21,12 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Base class yang akan digunakan oleh model-model data kita
 Base = declarative_base()
+
+# --- FUNGSI get_db BARU ---
+# Dependency untuk mendapatkan sesi database
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

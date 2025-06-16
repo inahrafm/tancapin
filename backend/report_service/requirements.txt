@@ -1,8 +1,10 @@
-# report_service/requirements.txt
-
+# backend/report_service/requirements.txt
 fastapi
 uvicorn[standard]
 pandas
-openpyxl # Untuk mendukung export ke file .xlsx
+openpyxl
 sqlalchemy
 psycopg2-binary
+
+# Untuk JWT authentication
+python-jose[cryptography] # <--- TAMBAHKAN BARIS INI

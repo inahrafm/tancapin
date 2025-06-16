@@ -1,4 +1,6 @@
-# recommendation_service/requirements.txt
-
+# backend/recommendation_service/requirements.txt
 fastapi
 uvicorn[standard]
+
+# Untuk JWT authentication
+python-jose[cryptography] # <--- TAMBAHKAN BARIS INI

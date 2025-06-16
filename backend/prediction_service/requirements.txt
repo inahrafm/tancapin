@@ -1,6 +1,8 @@
-# prediction_service/requirements.txt
-
+# backend/prediction_service/requirements.txt
 fastapi
 uvicorn[standard]
 pandas
 scikit-learn
+
+# Untuk JWT authentication
+python-jose[cryptography] # <--- TAMBAHKAN BARIS INI

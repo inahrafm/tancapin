@@ -1,6 +1,10 @@
-# iot_service/requirements.txt
-
+# backend/iot_service/requirements.txt
 fastapi
 uvicorn[standard]
-psycopg2-binary
+pandas
+openpyxl
 sqlalchemy
+psycopg2-binary
+
+# Untuk JWT authentication
+python-jose[cryptography] # <--- TAMBAHKAN BARIS INI

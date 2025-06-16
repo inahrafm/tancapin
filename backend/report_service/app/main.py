@@ -1,15 +1,18 @@
 # report_service/app/main.py
 
-from fastapi import FastAPI, Depends, HTTPException, status
+import os
+from fastapi import FastAPI, Depends, Query, HTTPException, status, Security
 from fastapi.responses import FileResponse
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from . import models
-from .database import SessionLocal, engine
-import pandas as pd
-import os
+from .database import SessionLocal, engine, get_db # <--- PASTIKAN get_db DIIMPORT DARI .database
 import datetime
+import pandas as pd
+from typing import List, Optional
+from jose import JWTError, jwt
+from fastapi.middleware.cors import CORSMiddleware
 
-# Membuat tabel di database jika belum ada (walaupun sudah dibuat oleh iot_service, ini memastikan)
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -17,27 +20,65 @@ app = FastAPI(
     description="API untuk menghasilkan dan mengunduh laporan data pertanian."
 )
 
-# Dependency untuk database session
-def get_db():
-    db = SessionLocal()
+# KONFIGURASI CORS
+origins = [
+    "http://localhost",
+    "http://localhost:8080", # Origin dari frontend React Anda
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# --- KONFIGURASI JWT UNTUK KEAMANAN API ---
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="http://localhost:8002/token")
+
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+ALGORITHM = "HS256"
+
+# Tambahkan pengecekan untuk SECRET_KEY saat startup
+if SECRET_KEY is None:
+    raise ValueError("JWT_SECRET_KEY not set in environment variables. Please check your .env file.")
+
+# Fungsi untuk mendapatkan user saat ini dari token JWT
+async def get_current_user(token: str = Security(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
-        yield db
-    finally:
-        db.close()
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError as e:
+        print(f"JWT Validation Error: {e}")
+        raise credentials_exception
+    except Exception as e:
+        print(f"Unexpected error during token validation: {e}")
+        raise credentials_exception
+    return username
+# ------------------------------------------
 
 @app.get("/")
 def root():
     return {"message": "Selamat datang di API Layanan Laporan Tancap!"}
 
-# Endpoint untuk mengunduh laporan data sensor dalam format Excel
+# --- PROTEKSI ENDPOINT DENGAN JWT ---
 @app.get("/reports/sensor_data_excel")
-def generate_sensor_data_excel_report(db: Session = Depends(get_db)):
+async def generate_sensor_data_excel_report(
+    db: Session = Depends(get_db), # <-- get_db sekarang diimport
+    current_user: str = Security(get_current_user)
+):
     """
-    Menghasilkan dan menyediakan laporan data sensor dalam format Excel.
+    Menghasilkan dan menyediakan laporan data sensor dalam format Excel. Membutuhkan autentikasi JWT.
     """
-    print("Membuat laporan data sensor Excel...")
-
-    # 1. Ambil semua data sensor dari database
+    print(f"User '{current_user}' meminta laporan data sensor Excel.")
     all_readings = db.query(models.SensorReading).all()
 
     if not all_readings:
@@ -46,8 +87,6 @@ def generate_sensor_data_excel_report(db: Session = Depends(get_db)):
             detail="Tidak ada data sensor yang ditemukan untuk dibuat laporan."
         )
 
-    # 2. Konversi data ke format Pandas DataFrame
-    # Mengubah objek SQLAlchemy menjadi dictionary agar mudah diolah Pandas
     data_dicts = []
     for reading in all_readings:
         data_dicts.append({
@@ -63,12 +102,10 @@ def generate_sensor_data_excel_report(db: Session = Depends(get_db)):
     
     df = pd.DataFrame(data_dicts)
 
-    # 3. Buat nama file yang unik
     timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     file_name = f"laporan_data_sensor_{timestamp_str}.xlsx"
-    file_path = f"/tmp/{file_name}" # Lokasi sementara di dalam kontainer
+    file_path = f"/tmp/{file_name}"
 
-    # 4. Simpan DataFrame ke file Excel
     try:
         df.to_excel(file_path, index=False, engine='openpyxl')
     except Exception as e:
@@ -80,7 +117,6 @@ def generate_sensor_data_excel_report(db: Session = Depends(get_db)):
 
     print(f"Laporan Excel berhasil dibuat di {file_path}")
 
-    # 5. Kirim file sebagai respons
     return FileResponse(
         path=file_path,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
