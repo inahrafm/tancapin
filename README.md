@@ -66,7 +66,7 @@ Pastikan Anda telah menginstal yang berikut ini di komputer Anda:
 ## Setup dan Menjalankan Aplikasi
 
 ###  Run
-Buka terminal dan ketik docker-compose up --build
+Buka terminal dan ketik docker-compose up --build <>
 
 ### Add db
 Buka terminal Anda dan ketik : 
