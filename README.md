@@ -71,6 +71,12 @@ Ikuti langkah-langkah ini untuk menyiapkan dan menjalankan seluruh aplikasi:
 
 Buka terminal Anda dan *clone* repositori proyek:
 
-```bash
 git clone [https://github.com/inahrafm/tancapin.git](https://github.com/inahrafm/tancapin.git) # Ganti dengan URL repo Anda yang sebenarnya
 cd tancapin # Masuk ke direktori proyek
+
+### 2. Run
+Buka terminal dan ketik : docker-compose up --build
+
+### 3. Add db
+Buka terminal Anda dan ketik : 
+docker exec -i tancap_db psql -U petani_tancap -d tancap_db < data_dump_tancap_project.sql
