@@ -4,6 +4,7 @@ import PredictionPage from './PredictionPage';
 import RecommendationPage from './RecommendationPage';
 import ReportPage from './ReportPage'; 
 import UserManagementPage from './UserManagementPage'; // Impor komponen UserManagementPage
+import logoTancap from './assets/logo-tancap.png'; // <--- IMPORT LOGO ANDA DI SINI
 
 // Komponen LoginRegisterPage
 const LoginRegisterPage = ({ onLoginSuccess }) => {
@@ -231,19 +232,8 @@ function App() {
           <div>
             {/* Logo atau Nama Aplikasi */}
             <div className="flex items-center justify-center lg:justify-start mb-10 mt-2">
-              <span className="text-4xl mr-2">
-                <svg width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="32" height="32" rx="8" fill="url(#paint0_linear_logo)"/>
-                  <path d="M12.7844 23.36V8.64H15.0244L19.4644 19.344H19.5204L24.0804 8.64H26.2564V23.36H24.0164V12.656H23.9604L19.5204 23.36H19.4644L15.0244 12.656H14.9684V23.36H12.7844Z" fill="white"/>
-                  <path d="M13.6161 7.232C13.6161 6.368 13.3761 5.616 12.8961 4.976C12.4321 4.352 11.8081 3.872 11.0241 3.536C10.2561 3.2 9.3921 3.024 8.4321 3.024C7.4721 3.024 6.6081 3.2 5.8401 3.536C5.0721 3.872 4.4481 4.352 3.9841 4.976C3.5201 5.616 3.2801 6.368 3.2801 7.232C3.2801 8.096 3.5201 8.848 3.9841 9.488C4.4481 10.112 5.0721 10.592 5.8401 10.928C6.6081 11.264 7.4721 11.44 8.4321 11.44C9.3921 11.44 10.2561 11.264 11.0241 10.928C11.8081 10.592 12.4321 10.112 12.8961 9.488C13.3761 8.848 13.6161 8.096 13.6161 7.232ZM11.4561 7.232C11.4561 7.696 11.3601 8.088 11.1681 8.392C10.9921 8.712 10.7041 8.968 10.2961 9.16C9.8881 9.352 9.4081 9.448 8.8721 9.448C8.3521 9.448 7.8721 9.352 7.4321 9.16C7.0081 8.968 6.6721 8.712 6.4321 8.392C6.2081 8.088 6.0801 7.696 6.0801 7.232C6.0801 6.768 6.2081 6.376 6.4321 6.064C6.6721 5.76 7.0081 5.512 7.4321 5.328C7.8721 5.144 8.3521 5.056 8.8721 5.056C9.4081 5.056 9.8881 5.144 10.2961 5.328C10.7041 5.512 10.9921 5.76 11.1681 6.064C11.3601 6.376 11.4561 6.768 11.4561 7.232Z" fill="white"/>
-                  <defs>
-                    <linearGradient id="paint0_linear_logo" x1="16" y1="0" x2="16" y2="32" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#A1F6A1"/>
-                      <stop offset="1" stopColor="#34B479"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </span>
+              {/* Menggunakan tag <img> untuk logo PNG Anda */}
+              <img src={logoTancap} alt="Tancap Logo" className="w-10 h-10 mr-2" />
               <h1 className="text-2xl font-bold text-gray-800">Tancap</h1>
             </div>
 
