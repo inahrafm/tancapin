@@ -1,6 +1,6 @@
 # Tancap
 
-Platform pertanian cerdas berbasis *microservices* untuk membantu petani di Lembang memantau kondisi lahan, mendapatkan prediksi hasil panen dan risiko hama, serta menerima rekomendasi pertanian yang cerdas.
+Platform pertanian cerdas berbasis *microservices* untuk membantu petani memantau kondisi lahan, mendapatkan prediksi hasil panen dan risiko hama, serta menerima rekomendasi pertanian yang cerdas.
 
 ## Fitur Utama
 
